@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recall — PM Case Study by Vy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #0f0e0c; --ink-2: #3a3830; --ink-3: #7a7568;
+    --paper: #f7f5f0; --cream: #edeae2;
+    --accent: #c84b2f; --accent-2: #e8a87c;
+    --green: #2d6a4f; --green-light: #d8f3dc;
+    --amber: #b5722a; --amber-light: #fef3e2;
+    --border: rgba(15,14,12,0.12);
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--sans); background: var(--paper); color: var(--ink); font-size: 16px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 3rem; background: rgba(247,245,240,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  .nav-logo { font-family: var(--serif); font-size: 1.1rem; color: var(--ink); text-decoration: none; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { font-size: 0.85rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--accent); }
+  .hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; padding-top: 5rem; }
+  .hero-left { padding: 5rem 3rem 5rem 5rem; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid var(--border); }
+  .hero-tag { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem; }
+  .hero-tag::before { content: ''; width: 24px; height: 1px; background: var(--accent); }
+  .hero h1 { font-family: var(--serif); font-size: clamp(3rem, 5vw, 5rem); line-height: 1.05; color: var(--ink); margin-bottom: 1.5rem; }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-desc { font-size: 1.05rem; color: var(--ink-2); max-width: 440px; margin-bottom: 2.5rem; line-height: 1.8; }
+  .hero-meta { display: flex; gap: 2rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .meta-item label { display: block; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 0.3rem; }
+  .meta-item span { font-size: 0.9rem; font-weight: 500; color: var(--ink); }
+  .hero-right { padding: 5rem 5rem 5rem 3rem; display: flex; flex-direction: column; justify-content: center; gap: 1rem; }
+  .briefing-card { background: var(--ink); border-radius: 16px; padding: 1.5rem; color: white; position: relative; overflow: hidden; }
+  .briefing-card::before { content: ''; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; border-radius: 50%; background: rgba(200,75,47,0.15); }
+  .briefing-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; }
+  .briefing-client { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 0.3rem; }
+  .briefing-meeting { font-weight: 500; font-size: 0.95rem; }
+  .briefing-time { background: var(--accent); color: white; font-size: 0.7rem; font-weight: 500; padding: 0.3rem 0.7rem; border-radius: 20px; }
+  .briefing-bullets { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+  .briefing-bullets li { display: flex; gap: 0.75rem; font-size: 0.875rem; line-height: 1.5; color: rgba(255,255,255,0.85); }
+  .bullet-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-2); margin-top: 0.45rem; flex-shrink: 0; }
+  .briefing-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
+  .briefing-source { font-size: 0.7rem; color: rgba(255,255,255,0.35); }
+  .briefing-actions { display: flex; gap: 0.5rem; }
+  .action-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: rgba(255,255,255,0.5); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .action-btn:hover { border-color: white; color: white; }
+  .status-pill { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; border-radius: 100px; font-size: 0.8rem; font-weight: 500; }
+  .status-pill.building { background: var(--amber-light); color: var(--amber); }
+  .status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  section { padding: 6rem 0; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 3rem; }
+  .section-label { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 1rem; }
+  .section-label span { font-family: var(--mono); color: var(--accent); }
+  h2 { font-family: var(--serif); font-size: clamp(2rem, 3.5vw, 3rem); line-height: 1.15; color: var(--ink); margin-bottom: 1.5rem; }
+  h3 { font-family: var(--serif); font-size: 1.35rem; color: var(--ink); margin-bottom: 0.75rem; }
+  p { color: var(--ink-2); margin-bottom: 1rem; }
+  .divider { height: 1px; background: var(--border); }
+  .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-top: 3rem; }
+  .problem-cell { background: var(--paper); padding: 2rem; }
+  .problem-cell.highlight { background: var(--ink); color: white; }
+  .problem-cell.highlight p { color: rgba(255,255,255,0.7); }
+  .problem-cell.highlight h3 { color: white; }
+  .stat-number { font-family: var(--serif); font-size: 3.5rem; line-height: 1; color: var(--accent); margin-bottom: 0.5rem; }
+  .stat-label { font-size: 0.85rem; color: var(--ink-3); font-weight: 500; }
+  .user-card { display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: start; background: var(--cream); border-radius: 16px; padding: 2.5rem; margin: 2rem 0; border: 1px solid var(--border); }
+  .user-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--ink); display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 1.75rem; color: var(--accent-2); flex-shrink: 0; }
+  .user-name { font-family: var(--serif); font-size: 1.5rem; margin-bottom: 0.25rem; }
+  .user-role { font-size: 0.85rem; color: var(--ink-3); margin-bottom: 1rem; }
+  .user-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .tag { padding: 0.3rem 0.8rem; border-radius: 100px; font-size: 0.75rem; font-weight: 500; background: var(--paper); color: var(--ink-2); border: 1px solid var(--border); }
+  .decisions-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-top: 2rem; }
+  .decision-item { display: grid; grid-template-columns: 1fr 1fr auto; gap: 1.5rem; align-items: start; background: var(--paper); padding: 1.75rem 2rem; transition: background 0.15s; }
+  .decision-item:hover { background: var(--cream); }
+  .decision-chose label, .decision-not label { display: block; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.4rem; font-weight: 500; }
+  .decision-chose label { color: var(--green); }
+  .decision-not label { color: var(--ink-3); }
+  .decision-chose p { margin: 0; font-size: 0.9rem; color: var(--ink); }
+  .decision-not p { margin: 0; font-size: 0.9rem; color: var(--ink-3); text-decoration: line-through; }
+  .decision-why { font-size: 0.78rem; color: var(--ink-3); font-style: italic; max-width: 200px; line-height: 1.5; }
+  .roadmap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
+  .roadmap-phase { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .phase-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .phase-number { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-3); }
+  .phase-badge { font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 100px; font-weight: 500; }
+  .phase-badge.active { background: var(--green-light); color: var(--green); }
+  .phase-badge.upcoming { background: var(--cream); color: var(--ink-3); }
+  .phase-body { padding: 1.5rem; }
+  .phase-title { font-family: var(--serif); font-size: 1.1rem; margin-bottom: 1rem; color: var(--ink); }
+  .phase-items { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+  .phase-items li { font-size: 0.85rem; color: var(--ink-2); display: flex; gap: 0.6rem; align-items: flex-start; }
+  .phase-items li::before { content: '—'; color: var(--ink-3); flex-shrink: 0; }
+  .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-top: 2rem; }
+  .metric-cell { background: var(--paper); padding: 2rem 1.5rem; text-align: center; }
+  .metric-value { font-family: var(--serif); font-size: 2.5rem; color: var(--ink); line-height: 1; margin-bottom: 0.5rem; }
+  .metric-unit { font-size: 1.2rem; color: var(--accent); }
+  .metric-desc { font-size: 0.8rem; color: var(--ink-3); line-height: 1.4; }
+  .learnings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+  .learning-card { border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; }
+  .learning-card.accent-card { background: var(--ink); border-color: var(--ink); }
+  .learning-card.accent-card h3 { color: white; }
+  .learning-card.accent-card p { color: rgba(255,255,255,0.65); }
+  .learning-number { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); margin-bottom: 1rem; }
+  .learning-card.accent-card .learning-number { color: var(--accent-2); }
+  .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 2rem; }
+  .team-card { border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; }
+  .team-icon { width: 48px; height: 48px; border-radius: 12px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+  .team-role { font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 0.4rem; font-weight: 500; }
+  .team-name { font-weight: 500; font-size: 0.9rem; color: var(--ink); margin-bottom: 0.5rem; }
+  .team-desc { font-size: 0.78rem; color: var(--ink-3); line-height: 1.5; }
+  .cta-section { background: var(--ink); color: white; padding: 6rem 3rem; text-align: center; }
+  .cta-section h2 { color: white; }
+  .cta-section p { color: rgba(255,255,255,0.6); max-width: 500px; margin: 0 auto 2.5rem; }
+  .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { padding: 0.85rem 2rem; background: var(--accent); color: white; border: none; border-radius: 100px; font-size: 0.875rem; font-weight: 500; font-family: var(--sans); cursor: pointer; text-decoration: none; display: inline-block; transition: opacity 0.2s; }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-outline { padding: 0.85rem 2rem; background: transparent; color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 100px; font-size: 0.875rem; font-weight: 500; font-family: var(--sans); cursor: pointer; text-decoration: none; display: inline-block; transition: border-color 0.2s; }
+  .btn-outline:hover { border-color: white; }
+  footer { padding: 2rem 3rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  footer p { font-size: 0.8rem; color: var(--ink-3); margin: 0; }
+  .pull-quote { border-left: 3px solid var(--accent); padding: 1.5rem 2rem; margin: 2.5rem 0; background: var(--cream); border-radius: 0 12px 12px 0; }
+  .pull-quote p { font-family: var(--serif); font-size: 1.2rem; font-style: italic; color: var(--ink); margin: 0; line-height: 1.6; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-left > * { animation: fadeUp 0.6s ease both; }
+  .hero-left > *:nth-child(1) { animation-delay: 0.1s; }
+  .hero-left > *:nth-child(2) { animation-delay: 0.2s; }
+  .hero-left > *:nth-child(3) { animation-delay: 0.3s; }
+  .hero-left > *:nth-child(4) { animation-delay: 0.4s; }
+  .hero-left > *:nth-child(5) { animation-delay: 0.5s; }
+  .hero-right { animation: fadeUp 0.6s ease 0.4s both; }
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-left { padding: 5rem 2rem 2rem; border-right: none; border-bottom: 1px solid var(--border); }
+    .hero-right { padding: 2rem; }
+    .problem-grid, .learnings-grid { grid-template-columns: 1fr; }
+    .roadmap { grid-template-columns: 1fr; }
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    .team-grid { grid-template-columns: repeat(2, 1fr); }
+    .decision-item { grid-template-columns: 1fr; }
+    nav { padding: 1rem 1.5rem; }
+    .container { padding: 0 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">Vy — PM Portfolio</a>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#decisions">Decisions</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#learnings">Learnings</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Case Study — In Progress</div>
+    <h1>Recall —<br><em>Never show up</em><br>unprepared again</h1>
+    <p class="hero-desc">A Mac menubar app that gives freelancers a 3-bullet context briefing 5 minutes before each client meeting — powered by their own Notion notes and Google Calendar.</p>
+    <div><span class="status-pill building">Building now</span></div>
+    <div class="hero-meta">
+      <div class="meta-item"><label>Role</label><span>Solo PM + Builder</span></div>
+      <div class="meta-item"><label>Platform</label><span>Mac menubar app</span></div>
+      <div class="meta-item"><label>Timeline</label><span>12 weeks</span></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="briefing-card">
+      <div class="briefing-header">
+        <div>
+          <div class="briefing-client">Acme Co — Maya's client</div>
+          <div class="briefing-meeting">Q2 Strategy Sync</div>
+        </div>
+        <div class="briefing-time">In 5 min</div>
+      </div>
+      <ul class="briefing-bullets">
+        <li><span class="bullet-dot"></span><span>Last meeting (Apr 17): They approved the new onboarding flow. Waiting on your revised timeline — still open.</span></li>
+        <li><span class="bullet-dot"></span><span>Budget discussion from March is resolved ✓ — focus shifted to Q2 growth targets instead.</span></li>
+        <li><span class="bullet-dot"></span><span>Action from you: Send competitive analysis before this call. Not sent yet — mention proactively.</span></li>
+      </ul>
+      <div class="briefing-footer">
+        <span class="briefing-source">From 6 Notion meeting notes · 3 months context</span>
+        <div class="briefing-actions">
+          <button class="action-btn">👍</button>
+          <button class="action-btn">👎</button>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:0.75rem; color:var(--ink-3); text-align:center; margin-top:0.75rem;">↑ What Maya sees 5 minutes before every meeting</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="problem">
+  <div class="container">
+    <div class="section-label"><span>01</span> The Problem</div>
+    <h2>Freelancers show up unprepared —<br>not from laziness, but from context overload</h2>
+    <div class="problem-grid">
+      <div class="problem-cell">
+        <div class="stat-number">15–20</div>
+        <div class="stat-label">minutes wasted per meeting searching notes</div>
+      </div>
+      <div class="problem-cell highlight">
+        <div class="stat-number" style="color:var(--accent-2)">2 of 3</div>
+        <div class="stat-label" style="color:rgba(255,255,255,0.5)">meetings attended underprepared when juggling 3+ clients</div>
+      </div>
+      <div class="problem-cell" style="grid-column: span 2;">
+        <h3>What users do today</h3>
+        <p style="margin-bottom:0;">Manually scroll back through email threads · Open Notion and search notes one by one · Trust memory and hope for the best · Arrive embarrassed in front of clients they charge significant fees</p>
+      </div>
+    </div>
+    <div class="pull-quote">
+      <p>"The pain isn't forgetting. It's spending 20 minutes every morning excavating your own notes just to remember what you already know."</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section>
+  <div class="container">
+    <div class="section-label"><span>02</span> The User</div>
+    <h2>Meet Maya — one specific<br>person, not a broad segment</h2>
+    <p>The sharper the user definition, the better every product decision becomes. Every feature debate becomes: <em>would Maya actually use this?</em></p>
+    <div class="user-card">
+      <div class="user-avatar">M</div>
+      <div>
+        <div class="user-name">Maya</div>
+        <div class="user-role">Independent consultant · 3 active clients · 8–12 meetings/week</div>
+        <div class="user-tags">
+          <span class="tag">Uses Notion daily</span>
+          <span class="tag">Google Calendar</span>
+          <span class="tag">Zoom meetings</span>
+          <span class="tag">Mac user</span>
+          <span class="tag">Pain level: 8/10</span>
+          <span class="tag">Charges premium fees</span>
+        </div>
+      </div>
+    </div>
+    <p>The emotional layer that drives willingness to pay: Maya doesn't just waste time — she feels embarrassed showing up underprepared to clients she charges $5,000/month. That's not a convenience problem. That's a professional identity problem.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="process">
+  <div class="container">
+    <div class="section-label"><span>03</span> How I Work</div>
+    <h2>Running a cross-functional<br>team with AI as every role</h2>
+    <p style="margin-bottom:2.5rem;">This project is built entirely solo — but not alone. Each AI tool plays a specific cross-functional role, mirroring how I'd work in a real product org.</p>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-icon" style="background:#edeae2;">🧭</div>
+        <div class="team-role">Product Manager</div>
+        <div class="team-name">Me (Vy)</div>
+        <div class="team-desc">Vision, decisions, prioritization, what we build and what we don't</div>
+      </div>
+      <div class="team-card">
+        <div class="team-icon" style="background:#edeae2;">📋</div>
+        <div class="team-role">PM Execution</div>
+        <div class="team-name">Claude Cowork</div>
+        <div class="team-desc">Specs, roadmaps, sprint plans, competitive briefs, stakeholder updates</div>
+      </div>
+      <div class="team-card">
+        <div class="team-icon" style="background:#edeae2;">💻</div>
+        <div class="team-role">Engineer</div>
+        <div class="team-name">Claude Code</div>
+        <div class="team-desc">Swift menubar app, Notion API, Calendar API, briefing logic</div>
+      </div>
+      <div class="team-card">
+        <div class="team-icon" style="background:#edeae2;">💼</div>
+        <div class="team-role">Stakeholder</div>
+        <div class="team-name">Claude Chat</div>
+        <div class="team-desc">Business advisor, challenge assumptions, validate thinking</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="decisions">
+  <div class="container">
+    <div class="section-label"><span>04</span> Key Decisions</div>
+    <h2>What I chose — and what<br>I deliberately said no to</h2>
+    <p>The hardest PM skill isn't deciding what to build. It's deciding what <em>not</em> to build and defending that with clear reasoning.</p>
+    <div class="decisions-list">
+      <div class="decision-item">
+        <div class="decision-chose"><label>Chose ✓</label><p>Local-first architecture — all data stays on user's machine</p></div>
+        <div class="decision-not"><label>Not this</label><p>Cloud server processing user's meeting notes</p></div>
+        <div class="decision-why">Freelancers have confidential client data. Privacy = trust = retention.</div>
+      </div>
+      <div class="decision-item">
+        <div class="decision-chose"><label>Chose ✓</label><p>Notion-only data source for v1</p></div>
+        <div class="decision-not"><label>Not this</label><p>Zoom + Teams + Gmail + Notion all at once</p></div>
+        <div class="decision-why">Scope creep kills MVPs. Validate the core loop first.</div>
+      </div>
+      <div class="decision-item">
+        <div class="decision-chose"><label>Chose ✓</label><p>Pre-meeting briefing only (pull feature)</p></div>
+        <div class="decision-not"><label>Not this</label><p>Post-meeting follow-up drafts in v1</p></div>
+        <div class="decision-why">Push features are harder. Earn trust with pull first, then earn permission to push.</div>
+      </div>
+      <div class="decision-item">
+        <div class="decision-chose"><label>Chose ✓</label><p>Recency weighting + keyword detection for context freshness</p></div>
+        <div class="decision-not"><label>Not this</label><p>Show all notes from past 6 months equally</p></div>
+        <div class="decision-why">Old resolved topics are noise. The briefing must earn trust every time it fires.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="roadmap">
+  <div class="container">
+    <div class="section-label"><span>05</span> Roadmap</div>
+    <h2>Three milestones to<br>public launch</h2>
+    <div class="roadmap">
+      <div class="roadmap-phase">
+        <div class="phase-header"><span class="phase-number">Milestone 01</span><span class="phase-badge active">Building now</span></div>
+        <div class="phase-body">
+          <div class="phase-title">MVP — The Core Loop</div>
+          <ul class="phase-items">
+            <li>Mac menubar app scaffold</li>
+            <li>Google Calendar connection</li>
+            <li>Notion API integration</li>
+            <li>3-bullet briefing display</li>
+            <li>Context freshness logic</li>
+            <li>Local-first data processing</li>
+          </ul>
+        </div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="phase-header"><span class="phase-number">Milestone 02</span><span class="phase-badge upcoming">Up next</span></div>
+        <div class="phase-body">
+          <div class="phase-title">Expand — More Sources</div>
+          <ul class="phase-items">
+            <li>Zoom AI recap via Gmail API</li>
+            <li>Client matching by email domain</li>
+            <li>Thumbs down feedback loop</li>
+            <li>Note quality scoring</li>
+            <li>Post-meeting follow-up draft</li>
+          </ul>
+        </div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="phase-header"><span class="phase-number">Milestone 03</span><span class="phase-badge upcoming">Launch</span></div>
+        <div class="phase-body">
+          <div class="phase-title">Ship — Public Launch</div>
+          <ul class="phase-items">
+            <li>OAuth flow for new users</li>
+            <li>Privacy page + security review</li>
+            <li>Submit to Notion gallery</li>
+            <li>Product Hunt launch</li>
+            <li>Freelancer community outreach</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section>
+  <div class="container">
+    <div class="section-label"><span>06</span> Success Metrics</div>
+    <h2>How I'll know<br>if it's working</h2>
+    <div class="metrics-grid">
+      <div class="metric-cell"><div class="metric-value">80<span class="metric-unit">%</span></div><div class="metric-desc">Briefing open rate before meetings</div></div>
+      <div class="metric-cell"><div class="metric-value">&lt;2<span class="metric-unit">min</span></div><div class="metric-desc">Meeting prep time (down from 15–20 min)</div></div>
+      <div class="metric-cell"><div class="metric-value">60<span class="metric-unit">%</span></div><div class="metric-desc">Retention at day 7</div></div>
+      <div class="metric-cell"><div class="metric-value">40<span class="metric-unit">%</span></div><div class="metric-desc">Retention at day 30</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="learnings">
+  <div class="container">
+    <div class="section-label"><span>07</span> Learnings So Far</div>
+    <h2>What this project<br>has already taught me</h2>
+    <div class="learnings-grid">
+      <div class="learning-card accent-card">
+        <div class="learning-number">01</div>
+        <h3>The best products connect tools, not replace them</h3>
+        <p>Zoom does its job. Notion does its job. Calendar does its job. Nobody connects them forward-looking for the freelancer. That gap IS the product.</p>
+      </div>
+      <div class="learning-card">
+        <div class="learning-number">02</div>
+        <h3>Data quality is a product problem, not a tech problem</h3>
+        <p>Recall's output is only as good as the user's Notion notes. That's a behavior design challenge — not something you solve with a better algorithm.</p>
+      </div>
+      <div class="learning-card">
+        <div class="learning-number">03</div>
+        <h3>Saying no is the hardest and most important skill</h3>
+        <p>Post-meeting follow-up, team features, Windows version — all cut from v1. Each cut made the remaining scope more credible and shippable.</p>
+      </div>
+      <div class="learning-card">
+        <div class="learning-number">04</div>
+        <h3>Privacy is a feature, not a constraint</h3>
+        <p>Choosing local-first wasn't just a safety decision — it became a core marketing angle. "Recall never sees your data" removes the biggest objection upfront.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <h2>Want to work together?</h2>
+  <p>I'm looking for PM roles where I can work on products that solve real problems for real people — and ship them.</p>
+  <div class="cta-buttons">
+    <a href="mailto:your@email.com" class="btn-primary">Get in touch</a>
+    <a href="https://github.com/nhatvyche/knowledge-work-plugins" class="btn-outline" target="_blank">See the GitHub repo</a>
+  </div>
+</section>
+
+<footer>
+  <p>Vy — Product Manager Portfolio · 2025</p>
+  <p>Built while learning. Documented in real time. Shipping to Notion Gallery.</p>
+</footer>
+
+</body>
+</html>
