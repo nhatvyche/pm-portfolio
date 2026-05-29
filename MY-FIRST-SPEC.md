@@ -1,6 +1,7 @@
 # MY-FIRST-SPEC.md — Recall
-> Product Requirements Document (PRD) · v1.0  
-> Author: Vy · Status: Draft · Last updated: May 2026
+> Product Requirements Document (PRD) · v1.1  
+> Author: Vy · Status: Draft · Last updated: May 2026  
+> v1.1 changes: Added zero-alternative analysis (Section 8a)
 
 ---
 
@@ -145,6 +146,29 @@ Scores above 10 = underserved. Scores based on estimated user research (to be va
 **Recall's differentiation:**  
 The only tool that connects ALL past meetings forward-looking, across tools, specifically
 for freelancers managing multiple client relationships.
+
+---
+
+## 8a. Zero-Alternative Analysis — What Maya Does Without Recall
+
+Recall's real competition is not other apps. It is the five manual behaviours Maya
+uses today, each with a real cost in time, trust, or both.
+
+| Behaviour | How often | Time cost | Why it still fails |
+|---|---|---|---|
+| Manual Notion search before meeting | ~3–4x per week for important clients | 10–20 min per meeting | No filtering — reads resolved topics too. Notes vary in quality. High cognitive load while rushing. |
+| Trust memory and wing it | ~2 out of 3 meetings for lower-priority clients | 5–10 min of meeting wasted on recapping | Memory degrades across 3+ clients. The client remembers everything. She doesn't. |
+| Scroll back through email threads | When Notion notes are incomplete | 15–20 min | No aggregation across tools — Zoom recap email + Notion notes = two separate searches. |
+| Paper notes / Reminders app | For action items only | Minimal prep, but incomplete context | Only captures actions, not full discussion history. Second system to maintain. Reminder fires but nothing useful to read. |
+| Skip prep entirely | For routine check-ins and smaller clients | None — but hidden cost | Relationship quality degrades silently. Client feels deprioritised. One missed context can cost a renewal. |
+
+**Key insight:**  
+Recall does not need to be a better app than Zoom AI or Notion. It needs to be faster
+and more reliable than 15 minutes of manual scrambling. That is a low bar to clear —
+and it is the right bar to aim for in v1.
+
+The most dangerous behaviour is the last one. Maya does not realise skipping prep is
+costing her client renewals. Recall makes the invisible cost visible — and eliminates it.
 
 ---
 
